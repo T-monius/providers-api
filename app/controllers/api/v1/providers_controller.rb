@@ -36,12 +36,14 @@ module Api::V1
         result = provider_response.dig('results', 0)
         provider_info = result['basic']
         location = result['addresses'].find { |address| address['address_purpose'] == 'LOCATION'}
+        taxonomies = result['taxonomies'].map { |taxonomy| taxonomy['desc'] }.join(', ')
         {
           npi: result['number'],
           name: "#{provider_info['name_prefix']} #{provider_info['first_name']} #{provider_info['last_name']} #{provider_info['credential']}",
           telephone_number: location['telephone_number'],
           address: "#{location['address_1']}, #{location['city']}, #{location['state']}, #{location['postal_code']}, #{location['country_name']}",
-          organization: result['enumeration_type'] == 'NPI-2'
+          organization: result['enumeration_type'] == 'NPI-2',
+          taxonomy: taxonomies
         }
     end
   end

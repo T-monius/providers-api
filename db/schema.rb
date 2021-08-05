@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_02_204617) do
+ActiveRecord::Schema.define(version: 2021_08_05_193637) do
 
   create_table "providers", force: :cascade do |t|
     t.string "npi"
@@ -20,6 +20,7 @@ ActiveRecord::Schema.define(version: 2021_08_02_204617) do
     t.boolean "organization"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "taxonomy"
   end
 
 end
