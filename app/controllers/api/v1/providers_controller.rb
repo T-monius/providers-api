@@ -8,10 +8,18 @@ module Api::V1
     end
 
     def create
-      puts provider_params
       provider_response = request_provider(provider_params[:npi])
       if provider_response
         @provider = Provider.create(format_provider_response(provider_response))
+        render json: @provider
+      end
+    end
+
+    def update
+      provider_response = request_provider(provider_params[:npi])
+      if provider_response
+        @provider = Provider.find_by(provider_params[:npi])
+        @provider.update(format_provider_response(provider_response))
         render json: @provider
       end
     end
@@ -37,13 +45,16 @@ module Api::V1
         provider_info = result['basic']
         location = result['addresses'].find { |address| address['address_purpose'] == 'LOCATION'}
         taxonomies = result['taxonomies'].map { |taxonomy| taxonomy['desc'] }.join(', ')
+        organization = result['enumeration_type'] == 'NPI-2',
+        provider_name = organization ? provider_info['name'] : "#{provider_info['name_prefix']} #{provider_info['first_name']} #{provider_info['last_name']} #{provider_info['credential']}"
+
         {
           npi: result['number'],
-          name: "#{provider_info['name_prefix']} #{provider_info['first_name']} #{provider_info['last_name']} #{provider_info['credential']}",
+          name: provider_name,
           telephone_number: location['telephone_number'],
           address: "#{location['address_1']}, #{location['city']}, #{location['state']}, #{location['postal_code']}, #{location['country_name']}",
-          organization: result['enumeration_type'] == 'NPI-2',
-          taxonomy: taxonomies
+          taxonomy: taxonomies,
+          organization: organization
         }
     end
   end
